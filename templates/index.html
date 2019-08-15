@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Layout
+{% endblock %}
+
+{% block main %}
+    <form action="/" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Url to be shortened" type="text"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Shorten</button>
+    </form>
+{% endblock %}
