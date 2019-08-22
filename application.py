@@ -47,7 +47,7 @@ def shorten():
         ############################
 
         # return shortened url
-        message = "https://link-away-api-heroku.herokuapp.com/"+index2url(currid)
+        message = "https://link-away-api-heroku.herokuapp.com/"+index2url(currid+100000000)
         return render_template("shortened.html",  message=message)
 
 
@@ -56,7 +56,7 @@ def shorten():
 
 @app.route('/<name>')
 def myfunc(name):
-  ind = url2index(name)
+  ind = url2index(name)-100000000
   query = db.session.query(URL).filter(URL.id == ind)
   currid = query[0].long_url
   return redirect('http://'+str(currid))
