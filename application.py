@@ -1,27 +1,29 @@
 from flask import Flask, render_template, redirect, request
+from flask_sqlalchemy import SQLAlchemy
 from helpers import index2url, url2index
 import psycopg2
-import sqlalchemy as db
+import os
 from psycopg2 import Error
+
+from flask_heroku import Heroku
+
 app = Flask(__name__)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/url_db'
+heroku = Heroku(app)
+db = SQLAlchemy(app)
 
 # @app.route('/', methods=["GET","POST"])
 # def index():
 #     return render_template('index.html')
 
 
-engine = db.create_engine('postgresql+psycopg2://aabelay@localhost/url_db')
-connection = engine.connect()
-metadata = db.MetaData()
+class URL(db.Model):
+  __tablename__ = "urls"
+  id = db.Column(db.Integer, primary_key=True)
+  long_url = db.Column(db.String(255), nullable=False)
 
-
-urls = db.Table('urls', metadata,
-              db.Column('id', db.Integer(), primary_key=True),
-              db.Column('long_url', db.String(255), nullable=False)
-              )
-
-metadata.create_all(engine) #Creates the table if not already existing
-
+  def __init__(self,long_url):
+    self.long_url = long_url
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -35,10 +37,12 @@ def shorten():
     else: 
         data = request.form.get("symbol")
 
+        me = URL(data)
+
         #### add data to DB
-        query = db.insert(urls).values(long_url=data)
-        ResultProxy = connection.execute(query)
-        currid = ResultProxy.inserted_primary_key[0]
+        db.session.add(me)
+        db.session.commit()
+        currid = me.id
 
         ############################
 
@@ -53,8 +57,8 @@ def shorten():
 @app.route('/<name>')
 def myfunc(name):
   ind = url2index(name)
-  query = db.select([urls.columns.long_url]).where(urls.columns.id==ind)
-  currid = connection.execute(query).scalar()
+  query = db.session.query(URL).filter(URL.id == ind)
+  currid = query[0].long_url
   return redirect('http://'+str(currid))
 
 
@@ -66,4 +70,3 @@ def myfunc(name):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
