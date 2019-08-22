@@ -47,7 +47,7 @@ def shorten():
         ############################
 
         # return shortened url
-        message = "localhost:5000/"+index2url(currid)
+        message = "https://link-away-api-heroku.herokuapp.com/"+index2url(currid)
         return render_template("shortened.html",  message=message)
 
 
