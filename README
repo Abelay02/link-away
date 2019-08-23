@@ -1,1 +1,3 @@
-URL shortener
+Running live at https://link-away-api-heroku.herokuapp.com/
+
+URL shortening service. Flask Web App with PostgreSQL database.
